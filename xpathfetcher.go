@@ -16,21 +16,27 @@ const DefaultXpath = "//rails_version"
 
 func extractXpathFromUrl(xpath string, url string) (string, error) {
 	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
-	// bodyText := string(body)
-	// fmt.Printf("Body is: %s", bodyText)
 
 	doc, err := gokogiri.ParseHtml(body)
 	defer doc.Free()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	// fmt.Printf("Parsed HTML: %s", doc)
-	n, _ := doc.Root().Search(xpath)
+
+	n, err := doc.Root().Search(xpath)
+	if err != nil {
+		return "", err
+	}
 	if len(n) < 1 {
 		return "", errors.New(fmt.Sprintf("Xpath not found: %s", xpath))
 	}
