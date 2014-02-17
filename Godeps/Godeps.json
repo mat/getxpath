@@ -1,0 +1,11 @@
+{
+	"ImportPath": "better-idea.org/xpathfetcher",
+	"GoVersion": "go1.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/moovweb/gokogiri",
+			"Comment": "4.8.28-33-g56545ca",
+			"Rev": "56545ca2ae760809669f000b924acd30769e4da3"
+		}
+	]
+}
