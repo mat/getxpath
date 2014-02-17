@@ -14,7 +14,7 @@ import (
 const DefaultUrl = "http://trakkor.better-idea.org/_status"
 const DefaultXpath = "//rails_version"
 
-func extractXpathFromUrl(xpath string, url string) (string, error) {
+func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -58,7 +58,7 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 			"error": "Need both url and xpath query parameter.",
 		}
 	} else {
-		content, err := extractXpathFromUrl(xpath, url)
+		content, err := ExtractXpathFromUrl(xpath, url)
 		result = map[string]interface{}{
 			"url":     url,
 			"xpath":   xpath,
@@ -79,7 +79,7 @@ func main() {
 	xpath := flag.String("xpath", DefaultXpath, "help message for xpath")
 	flag.Parse()
 
-	content, err := extractXpathFromUrl(*xpath, *url)
+	content, err := ExtractXpathFromUrl(*xpath, *url)
 	fmt.Printf("EXTRACTED: `%s`", content)
 
 	http.HandleFunc("/", handler)
