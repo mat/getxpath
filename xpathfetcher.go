@@ -40,21 +40,31 @@ func extractXpathFromUrl(xpath string, url string) (string, error) {
 }
 
 func handler(writer http.ResponseWriter, req *http.Request) {
-	values := req.URL.Query()
-	url := values.Get("url")
-	xpath := values.Get("xpath")
-	content, err := extractXpathFromUrl(xpath, url)
-
 	writer.Header().Add("Content-Type", "application/json")
 
-	result := map[string]interface{}{
-		"url":     url,
-		"xpath":   xpath,
-		"content": content,
-		"error":   err,
+	url := req.URL.Query().Get("url")
+	xpath := req.URL.Query().Get("xpath")
+
+	var result map[string]interface{}
+	if len(url) == 0 || len(xpath) == 0 {
+		http.Error(writer, http.StatusText(400), 400)
+		result = map[string]interface{}{
+			"error": "Need both url and xpath query parameter.",
+		}
+	} else {
+		content, err := extractXpathFromUrl(xpath, url)
+		result = map[string]interface{}{
+			"url":     url,
+			"xpath":   xpath,
+			"content": content,
+			"error":   err,
+		}
 	}
 
 	responseBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
 	writer.Write(responseBytes)
 }
 
