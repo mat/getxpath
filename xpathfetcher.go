@@ -47,7 +47,7 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 
 	var result map[string]interface{}
 	if len(url) == 0 || len(xpath) == 0 {
-		http.Error(writer, http.StatusText(400), 400)
+		writer.WriteHeader(400)
 		result = map[string]interface{}{
 			"error": "Need both url and xpath query parameter.",
 		}
