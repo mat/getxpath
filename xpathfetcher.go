@@ -1,7 +1,8 @@
 package main
 
 import (
-	// "encoding/json"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/moovweb/gokogiri"
@@ -96,12 +97,12 @@ import (
 const DefaultUrl = "http://trakkor.better-idea.org/_status"
 const DefaultXpath = "//rails_version"
 
-func extractXpathFromUrl(xpath string, url string) string {
+func extractXpathFromUrl(xpath string, url string) (string, error) {
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	// bodyText := string(body)
 	// fmt.Printf("Body is: %s", bodyText)
@@ -114,29 +115,30 @@ func extractXpathFromUrl(xpath string, url string) string {
 	// fmt.Printf("Parsed HTML: %s", doc)
 	n, _ := doc.Root().Search(xpath)
 	if len(n) < 1 {
-		fmt.Printf("Xpath not found: %s", xpath)
-		return ""
+		return "", errors.New(fmt.Sprintf("Xpath not found: %s", xpath))
 	}
 
 	result := n[0].Content()
-	return result
+	return result, nil
 }
 
 func handler(writer http.ResponseWriter, req *http.Request) {
-	fmt.Printf("url.query: %s\n", req.URL.Query())
-
-	// result = GetCheckResultForUrl(url)
-	// b, _ = json.MarshalIndent(result, "", "  ")
-	// fmt.Println(string(b))
-
 	values := req.URL.Query()
 	url := values.Get("url")
 	xpath := values.Get("xpath")
-	content := extractXpathFromUrl(xpath, url)
+	content, err := extractXpathFromUrl(xpath, url)
 
-	b := []byte(fmt.Sprintf(`{"url": "%s", "xpath": "%s", "content": "%s"}`, url, xpath, content))
 	writer.Header().Add("Content-Type", "application/json")
-	writer.Write(b)
+
+	result := map[string]interface{}{
+		"url":     url,
+		"xpath":   xpath,
+		"content": content,
+		"error":   err,
+	}
+
+	responseBytes, err := json.MarshalIndent(result, "", "  ")
+	writer.Write(responseBytes)
 }
 
 func main() {
@@ -144,11 +146,11 @@ func main() {
 	xpath := flag.String("xpath", DefaultXpath, "help message for xpath")
 	flag.Parse()
 
-	content := extractXpathFromUrl(*xpath, *url)
+	content, err := extractXpathFromUrl(*xpath, *url)
 	fmt.Printf("EXTRACTED: `%s`", content)
 
 	http.HandleFunc("/", handler)
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
 	}
