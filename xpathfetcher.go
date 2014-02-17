@@ -14,14 +14,23 @@ import (
 const DefaultUrl = "http://trakkor.better-idea.org/_status"
 const DefaultXpath = "//rails_version"
 
-func ExtractXpathFromUrl(xpath string, url string) (string, error) {
+func ReadBodyFromUrl(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
+func ExtractXpathFromUrl(xpath string, url string) (string, error) {
+	body, err := ReadBodyFromUrl(url)
 	if err != nil {
 		return "", err
 	}
@@ -33,15 +42,15 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	}
 	// fmt.Printf("Parsed HTML: %s", doc)
 
-	n, err := doc.Root().Search(xpath)
+	nodes, err := doc.Root().Search(xpath)
 	if err != nil {
 		return "", err
 	}
-	if len(n) < 1 {
+	if len(nodes) < 1 {
 		return "", errors.New(fmt.Sprintf("Xpath not found: %s", xpath))
 	}
 
-	result := n[0].Content()
+	result := nodes[0].Content()
 	return result, nil
 }
 
