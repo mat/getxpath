@@ -72,7 +72,7 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 			"url":     url,
 			"xpath":   xpath,
 			"content": content,
-			"error":   err,
+			"error":   ErrorMessageOrEmpty(err),
 		}
 	}
 
@@ -81,6 +81,14 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 	writer.Write(responseBytes)
+}
+
+func ErrorMessageOrEmpty(err error) string {
+	if err != nil {
+		return err.Error()
+	} else {
+		return ""
+	}
 }
 
 func main() {
