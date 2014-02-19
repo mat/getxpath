@@ -38,7 +38,12 @@ func TimeFromUnixTimeStampString(str string) time.Time {
 		return time.Time{}
 	}
 
-	return time.Unix(int64(i), 0)
+	cet, err := time.LoadLocation("CET")
+	if err != nil {
+		panic(err)
+	}
+
+	return time.Unix(int64(i), 0).In(cet)
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
