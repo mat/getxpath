@@ -5,10 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/moovweb/gokogiri"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/moovweb/gokogiri"
 )
 
 const DefaultUrl = "http://trakkor.better-idea.org/_status"
@@ -54,27 +55,32 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	return result, nil
 }
 
+type Result struct {
+	Url     string      `json:"url"`
+	Xpath   string      `json:"xpath"`
+	Content string      `json:"content"`
+	Error   interface{} `json:"error"`
+	Version string      `json:"version"`
+}
+
 func handler(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Add("Content-Type", "application/json")
 
 	url := req.URL.Query().Get("url")
 	xpath := req.URL.Query().Get("xpath")
 
-	var result map[string]interface{}
+	result := Result{
+		Url:     url,
+		Xpath:   xpath,
+		Version: os.Getenv("GIT_REVISION"),
+	}
 	if len(url) == 0 || len(xpath) == 0 {
 		writer.WriteHeader(400)
-		result = map[string]interface{}{
-			"error": "Need both url and xpath query parameter.",
-		}
+		result.Error = "Need both url and xpath query parameter."
 	} else {
 		content, err := ExtractXpathFromUrl(xpath, url)
-		result = map[string]interface{}{
-			"url":     url,
-			"xpath":   xpath,
-			"content": content,
-			"error":   ErrorMessageOrNil(err),
-			"version": os.Getenv("GIT_REVISION"),
-		}
+		result.Content = content
+		result.Error = ErrorMessageOrNil(err)
 	}
 
 	responseBytes, err := json.MarshalIndent(result, "", "  ")
