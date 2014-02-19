@@ -73,6 +73,7 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 			"xpath":   xpath,
 			"content": content,
 			"error":   ErrorMessageOrEmpty(err),
+			"version": os.Getenv("GIT_REVISION"),
 		}
 	}
 
