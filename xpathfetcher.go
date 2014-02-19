@@ -99,15 +99,22 @@ func parseCommandLineArgs() (string, string) {
 	return *url, *xpath
 }
 
-func main() {
+func runTestUsingCommentLineArgs() {
 	url, xpath := parseCommandLineArgs()
-
-	content, err := ExtractXpathFromUrl(xpath, url)
+	content, _ := ExtractXpathFromUrl(xpath, url)
 	fmt.Printf("EXTRACTED: `%s`", content)
+}
 
+func startServer() {
 	http.HandleFunc("/", handler)
-	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	port := os.Getenv("PORT")
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func main() {
+	runTestUsingCommentLineArgs()
+	startServer()
 }
