@@ -91,12 +91,18 @@ func ErrorMessageOrEmpty(err error) string {
 	}
 }
 
-func main() {
+func parseCommandLineArgs() (string, string) {
 	url := flag.String("url", DefaultUrl, "help message for url")
 	xpath := flag.String("xpath", DefaultXpath, "help message for xpath")
 	flag.Parse()
 
-	content, err := ExtractXpathFromUrl(*xpath, *url)
+	return *url, *xpath
+}
+
+func main() {
+	url, xpath := parseCommandLineArgs()
+
+	content, err := ExtractXpathFromUrl(xpath, url)
 	fmt.Printf("EXTRACTED: `%s`", content)
 
 	http.HandleFunc("/", handler)
