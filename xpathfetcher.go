@@ -72,7 +72,7 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 			"url":     url,
 			"xpath":   xpath,
 			"content": content,
-			"error":   ErrorMessageOrEmpty(err),
+			"error":   ErrorMessageOrNil(err),
 			"version": os.Getenv("GIT_REVISION"),
 		}
 	}
@@ -84,11 +84,11 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 	writer.Write(responseBytes)
 }
 
-func ErrorMessageOrEmpty(err error) string {
+func ErrorMessageOrNil(err error) interface{} {
 	if err != nil {
 		return err.Error()
 	} else {
-		return ""
+		return nil
 	}
 }
 
