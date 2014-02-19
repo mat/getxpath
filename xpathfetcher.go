@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/moovweb/gokogiri"
 )
@@ -28,6 +30,15 @@ func ReadBodyFromUrl(url string) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func TimeFromUnixTimeStampString(str string) time.Time {
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		return time.Time{}
+	}
+
+	return time.Unix(int64(i), 0)
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
@@ -56,11 +67,12 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 }
 
 type Result struct {
-	Url     string      `json:"url"`
-	Xpath   string      `json:"xpath"`
-	Content string      `json:"content"`
-	Error   interface{} `json:"error"`
-	Version string      `json:"version"`
+	Url        string      `json:"url"`
+	Xpath      string      `json:"xpath"`
+	Content    string      `json:"content"`
+	Error      interface{} `json:"error"`
+	Version    string      `json:"version"`
+	DeployedAt time.Time   `json:"deployed_at"`
 }
 
 func handler(writer http.ResponseWriter, req *http.Request) {
@@ -70,9 +82,10 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 	xpath := req.URL.Query().Get("xpath")
 
 	result := Result{
-		Url:     url,
-		Xpath:   xpath,
-		Version: os.Getenv("GIT_REVISION"),
+		Url:        url,
+		Xpath:      xpath,
+		Version:    os.Getenv("GIT_REVISION"),
+		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
 	}
 	if len(url) == 0 || len(xpath) == 0 {
 		writer.WriteHeader(400)
