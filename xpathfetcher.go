@@ -14,9 +14,6 @@ import (
 	"github.com/moovweb/gokogiri"
 )
 
-const DefaultUrl = "http://trakkor.better-idea.org/_status"
-const DefaultXpath = "//rails_version"
-
 func ReadBodyFromUrl(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -50,7 +47,6 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fmt.Printf("Parsed HTML: %s", doc)
 
 	nodes, err := doc.Root().Search(xpath)
 	if err != nil {
@@ -110,8 +106,8 @@ func ErrorMessageOrNil(err error) interface{} {
 }
 
 func parseCommandLineArgs() (string, string) {
-	url := flag.String("url", DefaultUrl, "help message for url")
-	xpath := flag.String("xpath", DefaultXpath, "help message for xpath")
+	url := flag.String("url", "", "help message for url")
+	xpath := flag.String("xpath", "", "help message for xpath")
 	flag.Parse()
 
 	return *url, *xpath
@@ -119,8 +115,10 @@ func parseCommandLineArgs() (string, string) {
 
 func runTestUsingCommentLineArgs() {
 	url, xpath := parseCommandLineArgs()
-	content, _ := ExtractXpathFromUrl(xpath, url)
-	fmt.Printf("EXTRACTED: `%s`", content)
+	if len(url) > 0 && len(xpath) > 0 {
+		content, _ := ExtractXpathFromUrl(xpath, url)
+		fmt.Printf("EXTRACTED: `%s`\n", content)
+	}
 }
 
 func startServer() {
