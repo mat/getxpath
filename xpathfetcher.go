@@ -33,17 +33,10 @@ func ReadBodyFromUrl(url string) ([]byte, error) {
 }
 
 func TimeFromUnixTimeStampString(str string) time.Time {
-	i, err := strconv.Atoi(str)
-	if err != nil {
-		return time.Time{}
-	}
+	n, _ := strconv.Atoi(str)
+	loc, _ := time.LoadLocation("CET")
 
-	cet, err := time.LoadLocation("CET")
-	if err != nil {
-		panic(err)
-	}
-
-	return time.Unix(int64(i), 0).In(cet)
+	return time.Unix(int64(n), 0).In(loc)
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
