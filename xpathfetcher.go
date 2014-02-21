@@ -122,8 +122,12 @@ func runTestUsingCommentLineArgs() {
 }
 
 func startServer() {
-	http.HandleFunc("/", handler)
 	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		panic("PORT missing")
+	}
+
+	http.HandleFunc("/", handler)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
