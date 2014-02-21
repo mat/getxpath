@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -70,6 +71,7 @@ type Result struct {
 }
 
 func handler(writer http.ResponseWriter, req *http.Request) {
+	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
 	url := req.URL.Query().Get("url")
