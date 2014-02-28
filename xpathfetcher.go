@@ -17,7 +17,13 @@ import (
 
 func ReadBodyFromUrl(url string) ([]byte, error) {
 	resp, err := http.Get(url)
+	for retries := 1; err != nil && retries <= 3; retries += 1 {
+		log.Printf("Retrying to fetch %s (%d)\n", url, retries)
+		time.Sleep(time.Duration(retries) * time.Second)
+		resp, err = http.Get(url)
+	}
 	if err != nil {
+		log.Printf("Fetching %s failed too many times.", url)
 		return nil, err
 	}
 
