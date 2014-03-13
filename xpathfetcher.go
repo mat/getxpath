@@ -79,7 +79,7 @@ type Status struct {
 	DeployedAt time.Time `json:"deployed_at"`
 }
 
-func handler(writer http.ResponseWriter, req *http.Request) {
+func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
@@ -153,7 +153,7 @@ func startServer() {
 	}
 
 	http.HandleFunc("/_status", statusHandler)
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", requestHandler)
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
