@@ -6,14 +6,16 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/moovweb/gokogiri"
 )
+
+var log = logrus.New()
 
 func ReadBodyFromUrl(url string) ([]byte, error) {
 	resp, err := http.Get(url)
@@ -23,7 +25,7 @@ func ReadBodyFromUrl(url string) ([]byte, error) {
 		resp, err = http.Get(url)
 	}
 	if err != nil {
-		log.Printf("Fetching %s failed too many times.", url)
+		log.Warn("Fetching %s failed too many times.", url)
 		return nil, err
 	}
 
@@ -60,7 +62,7 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 		return "", err
 	}
 	if len(nodes) < 1 {
-		return "", errors.New(fmt.Sprintf("Xpath not found: %s", xpath))
+		return "", errors.New(fmt.Sprintf("Xpath not found"))
 	}
 
 	result := nodes[0].Content()
@@ -97,6 +99,9 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		content, err := ExtractXpathFromUrl(xpath, url)
 		result.Content = content
 		result.Error = ErrorMessageOrNil(err)
+		if err != nil {
+			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(err))
+		}
 	}
 
 	responseBytes, err := json.MarshalIndent(result, "", "  ")
@@ -141,6 +146,7 @@ func statusHandler(writer http.ResponseWriter, req *http.Request) {
 
 	responseBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
+		log.Fatal(err)
 		panic(err)
 	}
 	writer.Write(responseBytes)

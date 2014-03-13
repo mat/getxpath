@@ -3,6 +3,14 @@
 	"GoVersion": "go1.2",
 	"Deps": [
 		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Rev": "ddcbea3dbabf5fa9413fc69270ea357823ba7736"
+		},
+		{
+			"ImportPath": "github.com/burke/ttyutils",
+			"Rev": "70f0d73eb47f7033f514f7f8f5138152fe1088fc"
+		},
+		{
 			"ImportPath": "github.com/moovweb/gokogiri",
 			"Comment": "4.8.28-33-g56545ca",
 			"Rev": "56545ca2ae760809669f000b924acd30769e4da3"
