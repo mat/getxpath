@@ -68,12 +68,15 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 }
 
 type Result struct {
-	Url        string      `json:"url"`
-	Xpath      string      `json:"xpath"`
-	Content    string      `json:"content"`
-	Error      interface{} `json:"error"`
-	Version    string      `json:"version"`
-	DeployedAt time.Time   `json:"deployed_at"`
+	Url     string      `json:"url"`
+	Xpath   string      `json:"xpath"`
+	Content string      `json:"content"`
+	Error   interface{} `json:"error"`
+}
+
+type Status struct {
+	Version    string    `json:"version"`
+	DeployedAt time.Time `json:"deployed_at"`
 }
 
 func handler(writer http.ResponseWriter, req *http.Request) {
@@ -84,10 +87,8 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 	xpath := req.URL.Query().Get("xpath")
 
 	result := Result{
-		Url:        url,
-		Xpath:      xpath,
-		Version:    os.Getenv("GIT_REVISION"),
-		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
+		Url:   url,
+		Xpath: xpath,
 	}
 	if len(url) == 0 || len(xpath) == 0 {
 		writer.WriteHeader(400)
@@ -129,13 +130,31 @@ func runTestUsingCommentLineArgs() {
 	}
 }
 
+func statusHandler(writer http.ResponseWriter, req *http.Request) {
+	log.Print(req)
+	writer.Header().Add("Content-Type", "application/json")
+
+	result := Status{
+		Version:    os.Getenv("GIT_REVISION"),
+		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
+	}
+
+	responseBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	writer.Write(responseBytes)
+}
+
 func startServer() {
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		panic("PORT missing")
 	}
 
+	http.HandleFunc("/_status", statusHandler)
 	http.HandleFunc("/", handler)
+
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
