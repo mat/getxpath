@@ -52,10 +52,13 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	}
 
 	doc, err := gokogiri.ParseHtml(body)
-	defer doc.Free()
 	if err != nil {
 		return "", err
 	}
+	if doc == nil {
+		return "", errors.New(fmt.Sprintf("Could not ParseHtml"))
+	}
+	defer doc.Free()
 
 	nodes, err := doc.Root().Search(xpath)
 	if err != nil {
