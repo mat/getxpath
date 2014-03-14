@@ -79,9 +79,16 @@ type Result struct {
 	Error   interface{} `json:"error"`
 }
 
+var status = &Status{}
+
 type Status struct {
 	Version    string    `json:"version"`
 	DeployedAt time.Time `json:"deployed_at"`
+
+	OkCount    int64     `json:"ok"`
+	ErrorCount int64     `json:"errors"`
+	LastOk     time.Time `json:"last_ok"`
+	LastError  time.Time `json:"last_error"`
 }
 
 func requestHandler(writer http.ResponseWriter, req *http.Request) {
@@ -105,6 +112,14 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(err))
 		}
+	}
+
+	if result.Error != nil {
+		status.LastError = time.Now()
+		status.ErrorCount += 1
+	} else {
+		status.LastOk = time.Now()
+		status.OkCount += 1
 	}
 
 	responseBytes, err := json.MarshalIndent(result, "", "  ")
@@ -142,12 +157,7 @@ func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
-	result := Status{
-		Version:    os.Getenv("GIT_REVISION"),
-		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
-	}
-
-	responseBytes, err := json.MarshalIndent(result, "", "  ")
+	responseBytes, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
@@ -173,4 +183,11 @@ func startServer() {
 func main() {
 	runTestUsingCommentLineArgs()
 	startServer()
+}
+
+func init() {
+	status = &Status{
+		Version:    os.Getenv("GIT_REVISION"),
+		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
+	}
 }
