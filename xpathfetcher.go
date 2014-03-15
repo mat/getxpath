@@ -60,7 +60,12 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 	}
 	defer doc.Free()
 
-	nodes, err := doc.Root().Search(xpath)
+	root := doc.Root()
+	if root == nil {
+		return "", errors.New(fmt.Sprintf("Could not ParseHtml: Doc has no root"))
+	}
+
+	nodes, err := root.Search(xpath)
 	if err != nil {
 		return "", err
 	}
