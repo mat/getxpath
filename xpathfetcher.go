@@ -29,13 +29,13 @@ func ReadBodyFromUrl(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return body, nil
+	return bytes, nil
 }
 
 func TimeFromUnixTimeStampString(str string) time.Time {
@@ -46,12 +46,13 @@ func TimeFromUnixTimeStampString(str string) time.Time {
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
-	body, err := ReadBodyFromUrl(url)
+	bytes, err := ReadBodyFromUrl(url)
 	if err != nil {
 		return "", err
 	}
+	status.BytesProcessed += int64(len(bytes))
 
-	doc, err := gokogiri.ParseHtml(body)
+	doc, err := gokogiri.ParseHtml(bytes)
 	if err != nil {
 		return "", err
 	}
@@ -90,10 +91,11 @@ type Status struct {
 	Version    string
 	DeployedAt time.Time
 
-	OkCount    int64
-	ErrorCount int64
-	LastOk     time.Time
-	LastError  time.Time
+	OkCount        int64
+	ErrorCount     int64
+	LastOk         time.Time
+	LastError      time.Time
+	BytesProcessed int64
 }
 
 func requestHandler(writer http.ResponseWriter, req *http.Request) {
