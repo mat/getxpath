@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
@@ -87,13 +88,13 @@ type Result struct {
 var status = &Status{}
 
 type Status struct {
-	Version    string    `json:"version"`
-	DeployedAt time.Time `json:"deployed_at"`
+	Version    string
+	DeployedAt time.Time
 
-	OkCount    int64     `json:"ok"`
-	ErrorCount int64     `json:"errors"`
-	LastOk     time.Time `json:"last_ok"`
-	LastError  time.Time `json:"last_error"`
+	OkCount    int64
+	ErrorCount int64
+	LastOk     time.Time
+	LastError  time.Time
 }
 
 func requestHandler(writer http.ResponseWriter, req *http.Request) {
@@ -160,9 +161,9 @@ func runTestUsingCommentLineArgs() {
 
 func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
-	writer.Header().Add("Content-Type", "application/json")
+	writer.Header().Add("Content-Type", "application/xml")
 
-	responseBytes, err := json.MarshalIndent(status, "", "  ")
+	responseBytes, err := xml.MarshalIndent(status, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
