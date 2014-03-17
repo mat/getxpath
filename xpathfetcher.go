@@ -129,16 +129,16 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		status.OkCount += 1
 	}
 
-	responseBytes, err := json.MarshalIndent(result, "", "  ")
+	bytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		panic(err)
 	}
-	writer.Write(responseBytes)
+	writer.Write(bytes)
 }
 
-func ErrorMessageOrNil(err error) interface{} {
-	if err != nil {
-		return err.Error()
+func ErrorMessageOrNil(e error) interface{} {
+	if e != nil {
+		return e.Error()
 	} else {
 		return nil
 	}
@@ -164,12 +164,12 @@ func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
-	responseBytes, err := json.MarshalIndent(status, "", "  ")
+	bytes, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
 	}
-	writer.Write(responseBytes)
+	writer.Write(bytes)
 }
 
 func startServer() {
