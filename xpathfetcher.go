@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
@@ -161,9 +160,9 @@ func runTestUsingCommentLineArgs() {
 
 func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
-	writer.Header().Add("Content-Type", "application/xml")
+	writer.Header().Add("Content-Type", "application/json")
 
-	responseBytes, err := xml.MarshalIndent(status, "", "  ")
+	responseBytes, err := json.MarshalIndent(status, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 		panic(err)
