@@ -74,8 +74,8 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 		return "", errors.New(fmt.Sprintf("Xpath not found"))
 	}
 
-	result := nodes[0].Content()
-	return result, nil
+	res := nodes[0].Content()
+	return res, nil
 }
 
 type Result struct {
@@ -109,23 +109,23 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	url := req.URL.Query().Get("url")
 	xpath := req.URL.Query().Get("xpath")
 
-	result := Result{
+	res := Result{
 		Url:   url,
 		Xpath: xpath,
 	}
 	if len(url) == 0 || len(xpath) == 0 {
 		writer.WriteHeader(400)
-		result.Error = "Need both url and xpath query parameter."
+		res.Error = "Need both url and xpath query parameter."
 	} else {
 		content, e := ExtractXpathFromUrl(xpath, url)
-		result.Content = content
-		result.Error = ErrorMessageOrNil(e)
+		res.Content = content
+		res.Error = ErrorMessageOrNil(e)
 		if e != nil {
 			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(e))
 		}
 	}
 
-	if result.Error != nil {
+	if res.Error != nil {
 		status.LastError = time.Now()
 		status.ErrorCount += 1
 	} else {
@@ -133,7 +133,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		status.OkCount += 1
 	}
 
-	bytes, e := json.MarshalIndent(result, "", "  ")
+	bytes, e := json.MarshalIndent(res, "", "  ")
 	if e != nil {
 		panic(e)
 	}
