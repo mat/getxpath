@@ -88,8 +88,9 @@ type Result struct {
 var status = &Status{}
 
 type Status struct {
-	Version    string
-	DeployedAt time.Time
+	Version      string
+	DeployedAt   time.Time
+	FirstRequest time.Time
 
 	OkCount        int64
 	ErrorCount     int64
@@ -99,6 +100,9 @@ type Status struct {
 }
 
 func requestHandler(writer http.ResponseWriter, req *http.Request) {
+	if (status.FirstRequest == time.Time{}) {
+		status.FirstRequest = time.Now()
+	}
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
