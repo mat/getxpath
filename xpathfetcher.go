@@ -18,20 +18,20 @@ import (
 var log = logrus.New()
 
 func ReadBodyFromUrl(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	for retries := 1; err != nil && retries <= 3; retries += 1 {
+	resp, e := http.Get(url)
+	for retries := 1; e != nil && retries <= 3; retries += 1 {
 		log.Printf("Retrying to fetch %s (%d)\n", url, retries)
 		time.Sleep(time.Duration(retries) * time.Second)
-		resp, err = http.Get(url)
+		resp, e = http.Get(url)
 	}
-	if err != nil {
+	if e != nil {
 		log.Warn("Fetching %s failed too many times.", url)
-		return nil, err
+		return nil, e
 	}
 
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+	bytes, e := ioutil.ReadAll(resp.Body)
+	if e != nil {
+		return nil, e
 	}
 	defer resp.Body.Close()
 
@@ -46,15 +46,15 @@ func TimeFromUnixTimeStampString(str string) time.Time {
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
-	bytes, err := ReadBodyFromUrl(url)
-	if err != nil {
-		return "", err
+	bytes, e := ReadBodyFromUrl(url)
+	if e != nil {
+		return "", e
 	}
 	status.BytesProcessed += int64(len(bytes))
 
-	doc, err := gokogiri.ParseHtml(bytes)
-	if err != nil {
-		return "", err
+	doc, e := gokogiri.ParseHtml(bytes)
+	if e != nil {
+		return "", e
 	}
 	if doc == nil {
 		return "", errors.New(fmt.Sprintf("Could not ParseHtml"))
@@ -66,9 +66,9 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 		return "", errors.New(fmt.Sprintf("Could not ParseHtml: Doc has no root"))
 	}
 
-	nodes, err := root.Search(xpath)
-	if err != nil {
-		return "", err
+	nodes, e := root.Search(xpath)
+	if e != nil {
+		return "", e
 	}
 	if len(nodes) < 1 {
 		return "", errors.New(fmt.Sprintf("Xpath not found"))
@@ -117,11 +117,11 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		writer.WriteHeader(400)
 		result.Error = "Need both url and xpath query parameter."
 	} else {
-		content, err := ExtractXpathFromUrl(xpath, url)
+		content, e := ExtractXpathFromUrl(xpath, url)
 		result.Content = content
-		result.Error = ErrorMessageOrNil(err)
-		if err != nil {
-			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(err))
+		result.Error = ErrorMessageOrNil(e)
+		if e != nil {
+			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(e))
 		}
 	}
 
@@ -133,9 +133,9 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		status.OkCount += 1
 	}
 
-	bytes, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
-		panic(err)
+	bytes, e := json.MarshalIndent(result, "", "  ")
+	if e != nil {
+		panic(e)
 	}
 	writer.Write(bytes)
 }
@@ -168,10 +168,10 @@ func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
-	bytes, err := json.MarshalIndent(status, "", "  ")
-	if err != nil {
-		log.Fatal(err)
-		panic(err)
+	bytes, e := json.MarshalIndent(status, "", "  ")
+	if e != nil {
+		log.Fatal(e)
+		panic(e)
 	}
 	writer.Write(bytes)
 }
@@ -185,9 +185,9 @@ func startServer() {
 	http.HandleFunc("/_status", statusHandler)
 	http.HandleFunc("/", requestHandler)
 
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		panic(err)
+	e := http.ListenAndServe(":"+port, nil)
+	if e != nil {
+		panic(e)
 	}
 }
 
