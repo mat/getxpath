@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -89,6 +90,7 @@ var status = &Status{}
 
 type Status struct {
 	Version      string
+	GoVersion    string
 	DeployedAt   time.Time
 	FirstRequest time.Time
 
@@ -199,6 +201,7 @@ func main() {
 func init() {
 	status = &Status{
 		Version:    os.Getenv("GIT_REVISION"),
+		GoVersion:  runtime.Version(),
 		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
 	}
 }
