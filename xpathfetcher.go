@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -11,6 +12,8 @@ import (
 	"runtime"
 	"strconv"
 	"time"
+
+	"code.google.com/p/go.net/html/charset"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/moovweb/gokogiri"
@@ -47,13 +50,18 @@ func TimeFromUnixTimeStampString(str string) time.Time {
 }
 
 func ExtractXpathFromUrl(xpath string, url string) (string, error) {
-	bytes, e := ReadBodyFromUrl(url)
+	bodyBytes, e := ReadBodyFromUrl(url)
 	if e != nil {
 		return "", e
 	}
-	status.BytesProcessed += int64(len(bytes))
+	status.BytesProcessed += int64(len(bodyBytes))
 
-	doc, e := gokogiri.ParseHtml(bytes)
+	utf8bytes, e := convertToUtf8(bodyBytes)
+	if e != nil {
+		return "", e
+	}
+
+	doc, e := gokogiri.ParseHtml(utf8bytes)
 	if e != nil {
 		return "", e
 	}
@@ -77,6 +85,13 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 
 	res := nodes[0].Content()
 	return res, nil
+}
+
+func convertToUtf8(bytez []byte) ([]byte, error) {
+	reader := bytes.NewReader(bytez)
+	utf8reader, e := charset.NewReader(reader, "")
+	utf8bytes, e := ioutil.ReadAll(utf8reader)
+	return utf8bytes, e
 }
 
 type Result struct {
