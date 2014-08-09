@@ -121,7 +121,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		status.FirstRequest = time.Now()
 	}
 	log.Print(req)
-	writer.Header().Add("Content-Type", "application/json")
+	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 
 	url := req.URL.Query().Get("url")
 	xpath := req.URL.Query().Get("xpath")
