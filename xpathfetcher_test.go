@@ -37,10 +37,32 @@ func TestUmlautsOnAmazonDe(t *testing.T) {
 	runTest(t, expected, uri, xpath)
 }
 
+func TestErrorForNonExistentHost(t *testing.T) {
+	xpath := "//title"
+	uri := "http://www.does-not-exist-domain.de"
+	expectError(t, uri, xpath)
+}
+
+func TestErrorForNonExistentXpathElement(t *testing.T) {
+	xpath := "//does_not_exist"
+	uri := "http://www.better-idea.org"
+	expectError(t, uri, xpath)
+}
+
+func expectError(t *testing.T, uri string, xpath string) {
+	actual, e := ExtractXpathFromUrl(xpath, uri)
+	if e == nil {
+		t.Errorf("Did expect an eror but got none.")
+	}
+	if actual != "" {
+		t.Errorf("Expected empty result, but got ExtractXpathFromUrl(%v, %v) = '%v'", xpath, uri, actual)
+	}
+}
+
 func runTest(t *testing.T, expected string, uri string, xpath string) {
 	actual, e := ExtractXpathFromUrl(xpath, uri)
 	if e != nil {
-		t.Errorf("Did not expect and eror but got: %v", e)
+		t.Errorf("Did not expect an eror but got: %v", e)
 	}
 	if actual != expected {
 		t.Errorf("Got ExtractXpathFromUrl(%v, %v) = '%v', wanted '%v'", xpath, uri, actual, expected)
