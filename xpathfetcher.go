@@ -94,9 +94,13 @@ func convertToUtf8(bytez []byte) ([]byte, error) {
 	return utf8bytes, e
 }
 
+type Query struct {
+	Url   string `json:"url"`
+	Xpath string `json:"xpath"`
+}
+
 type Result struct {
-	Url     string      `json:"url"`
-	Xpath   string      `json:"xpath"`
+	Query   interface{} `json:"query"`
 	Content string      `json:"content"`
 	Error   interface{} `json:"error"`
 }
@@ -123,22 +127,23 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	log.Print(req)
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 
-	url := req.URL.Query().Get("url")
-	xpath := req.URL.Query().Get("xpath")
+	q := Query{
+		Url:   req.URL.Query().Get("url"),
+		Xpath: req.URL.Query().Get("xpath"),
+	}
 
 	res := Result{
-		Url:   url,
-		Xpath: xpath,
+		Query: q,
 	}
-	if len(url) == 0 || len(xpath) == 0 {
+	if len(q.Url) == 0 || len(q.Xpath) == 0 {
 		writer.WriteHeader(400)
 		res.Error = "Need both url and xpath query parameter."
 	} else {
-		content, e := ExtractXpathFromUrl(xpath, url)
+		content, e := ExtractXpathFromUrl(q.Xpath, q.Url)
 		res.Content = content
 		res.Error = ErrorMessageOrNil(e)
 		if e != nil {
-			log.WithFields(logrus.Fields{"url": url, "xpath": xpath}).Error(ErrorMessageOrNil(e))
+			log.WithFields(logrus.Fields{"query": q}).Error(ErrorMessageOrNil(e))
 		}
 	}
 
