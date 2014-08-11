@@ -205,7 +205,7 @@ func startServer() {
 	}
 
 	http.HandleFunc("/_status", statusHandler)
-	http.HandleFunc("/", requestHandler)
+	http.HandleFunc("/get", requestHandler)
 
 	e := http.ListenAndServe(":"+port, nil)
 	if e != nil {
