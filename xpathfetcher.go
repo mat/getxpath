@@ -100,9 +100,9 @@ type Query struct {
 }
 
 type Result struct {
-	Query   interface{} `json:"query"`
-	Content string      `json:"content"`
-	Error   interface{} `json:"error"`
+	Query  interface{} `json:"query"`
+	Result string      `json:"result"`
+	Error  interface{} `json:"error"`
 }
 
 var status = &Status{}
@@ -140,7 +140,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		res.Error = "Need both url and xpath query parameter."
 	} else {
 		content, e := ExtractXpathFromUrl(q.Xpath, q.Url)
-		res.Content = content
+		res.Result = content
 		res.Error = ErrorMessageOrNil(e)
 		if e != nil {
 			log.WithFields(logrus.Fields{"query": q}).Error(ErrorMessageOrNil(e))
