@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -15,21 +16,20 @@ import (
 
 	"code.google.com/p/go.net/html/charset"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/moovweb/gokogiri"
 )
 
-var log = logrus.New()
+var logger = log.New(os.Stdout, "getxpath: ", log.LstdFlags|log.Lmicroseconds)
 
 func ReadBodyFromUrl(url string) ([]byte, error) {
 	resp, e := http.Get(url)
 	for retries := 1; e != nil && retries <= 3; retries += 1 {
-		log.Printf("Retrying to fetch %s (%d)\n", url, retries)
+		logger.Printf("Retrying to fetch %s (%d)\n", url, retries)
 		time.Sleep(time.Duration(retries) * time.Second)
 		resp, e = http.Get(url)
 	}
 	if e != nil {
-		log.Warn("Fetching %s failed too many times.", url)
+		logger.Printf("Fetching %s failed too many times.", url)
 		return nil, e
 	}
 
@@ -124,7 +124,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	if (status.FirstRequest == time.Time{}) {
 		status.FirstRequest = time.Now()
 	}
-	log.Print(req)
+	logger.Print(req)
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 
 	q := Query{
@@ -143,7 +143,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		res.Result = content
 		res.Error = ErrorMessageOrNil(e)
 		if e != nil {
-			log.WithFields(logrus.Fields{"query": q}).Error(ErrorMessageOrNil(e))
+			logger.Printf("ERROR: Could not get xpath for query %v because: %v", q, e)
 		}
 	}
 
@@ -187,13 +187,12 @@ func runTestUsingCommentLineArgs() {
 }
 
 func statusHandler(writer http.ResponseWriter, req *http.Request) {
-	log.Print(req)
+	logger.Print(req)
 	writer.Header().Add("Content-Type", "application/json")
 
 	bytes, e := json.MarshalIndent(status, "", "  ")
 	if e != nil {
-		log.Fatal(e)
-		panic(e)
+		logger.Panic(e)
 	}
 	writer.Write(bytes)
 }
