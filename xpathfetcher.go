@@ -1,5 +1,7 @@
 package main
 
+import _ "expvar"
+
 import (
 	"bytes"
 	"encoding/json"
