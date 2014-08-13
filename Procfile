@@ -1,1 +1,1 @@
-web: xpathfetcher
+web: xpathfetcher -port=$PORT

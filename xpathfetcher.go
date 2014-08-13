@@ -172,16 +172,16 @@ func ErrorMessageOrNil(e error) interface{} {
 	}
 }
 
-func parseCommandLineArgs() (string, string) {
-	url := flag.String("url", "", "help message for url")
-	xpath := flag.String("xpath", "", "help message for xpath")
+func parseCommandLineArgs() (string, string, int) {
+	url := flag.String("url", "", "URL to fetch")
+	xpath := flag.String("xpath", "", "XPath to extract from the document at <url>")
+	port := flag.Int("port", 0, "Port in server mode")
 	flag.Parse()
 
-	return *url, *xpath
+	return *url, *xpath, *port
 }
 
-func runTestUsingCommentLineArgs() {
-	url, xpath := parseCommandLineArgs()
+func runTestUsingCommentLineArgs(url string, xpath string) {
 	if len(url) > 0 && len(xpath) > 0 {
 		content, _ := ExtractXpathFromUrl(xpath, url)
 		fmt.Printf("EXTRACTED: `%s`\n", content)
@@ -199,24 +199,27 @@ func statusHandler(writer http.ResponseWriter, req *http.Request) {
 	writer.Write(bytes)
 }
 
-func startServer() {
-	port := os.Getenv("PORT")
-	if len(port) == 0 {
-		panic("PORT missing")
-	}
-
+func startServer(port int) {
 	http.HandleFunc("/_status", statusHandler)
 	http.HandleFunc("/get", requestHandler)
 
-	e := http.ListenAndServe(":"+port, nil)
+	e := http.ListenAndServe(":"+strconv.Itoa(port), nil)
 	if e != nil {
 		panic(e)
 	}
 }
 
 func main() {
-	runTestUsingCommentLineArgs()
-	startServer()
+	url, xpath, port := parseCommandLineArgs()
+
+	if port > 0 {
+		startServer(port)
+	} else if url != "" && xpath != "" {
+		runTestUsingCommentLineArgs(url, xpath)
+	} else {
+		flag.PrintDefaults()
+	}
+
 }
 
 func init() {
