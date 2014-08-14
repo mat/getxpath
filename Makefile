@@ -1,4 +1,7 @@
 
+test:
+	go test
+
 update_godeps: 
 	godep save .
 

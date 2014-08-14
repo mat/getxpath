@@ -5,7 +5,6 @@ import _ "expvar"
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -23,9 +22,9 @@ import (
 
 var logger = log.New(os.Stdout, "getxpath: ", log.LstdFlags|log.Lmicroseconds)
 
-func ReadBodyFromUrl(url string) ([]byte, error) {
+func readBodyFromURL(url string) ([]byte, error) {
 	resp, e := http.Get(url)
-	for retries := 1; e != nil && retries <= 3; retries += 1 {
+	for retries := 1; e != nil && retries <= 3; retries++ {
 		logger.Printf("Retrying to fetch %s (%d)\n", url, retries)
 		time.Sleep(time.Duration(retries) * time.Second)
 		resp, e = http.Get(url)
@@ -44,15 +43,15 @@ func ReadBodyFromUrl(url string) ([]byte, error) {
 	return bytes, nil
 }
 
-func TimeFromUnixTimeStampString(str string) time.Time {
+func timeFromUnixTimeStampString(str string) time.Time {
 	n, _ := strconv.Atoi(str)
 	loc, _ := time.LoadLocation("CET")
 
 	return time.Unix(int64(n), 0).In(loc)
 }
 
-func ExtractXpathFromUrl(xpath string, url string) (string, error) {
-	bodyBytes, e := ReadBodyFromUrl(url)
+func ExtractXpathFromURL(xpath string, url string) (string, error) {
+	bodyBytes, e := readBodyFromURL(url)
 	if e != nil {
 		return "", e
 	}
@@ -68,13 +67,13 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 		return "", e
 	}
 	if doc == nil {
-		return "", errors.New(fmt.Sprintf("Could not ParseHtml"))
+		return "", fmt.Errorf("Could not ParseHtml")
 	}
 	defer doc.Free()
 
 	root := doc.Root()
 	if root == nil {
-		return "", errors.New(fmt.Sprintf("Could not ParseHtml: Doc has no root"))
+		return "", fmt.Errorf("Could not ParseHtml: Doc has no root")
 	}
 
 	nodes, e := root.Search(xpath)
@@ -82,7 +81,7 @@ func ExtractXpathFromUrl(xpath string, url string) (string, error) {
 		return "", e
 	}
 	if len(nodes) < 1 {
-		return "", errors.New(fmt.Sprintf("Xpath not found"))
+		return "", fmt.Errorf("Xpath not found")
 	}
 
 	res := nodes[0].Content()
@@ -96,20 +95,20 @@ func convertToUtf8(bytez []byte) ([]byte, error) {
 	return utf8bytes, e
 }
 
-type Query struct {
-	Url   string `json:"url"`
+type query struct {
+	URL   string `json:"url"`
 	Xpath string `json:"xpath"`
 }
 
-type Result struct {
+type result struct {
 	Query  interface{} `json:"query"`
 	Result string      `json:"result"`
 	Error  interface{} `json:"error"`
 }
 
-var status = &Status{}
+var status = &statusData{}
 
-type Status struct {
+type statusData struct {
 	Version      string
 	GoVersion    string
 	DeployedAt   time.Time
@@ -129,21 +128,21 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	logger.Print(req)
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 
-	q := Query{
-		Url:   req.URL.Query().Get("url"),
+	q := query{
+		URL:   req.URL.Query().Get("url"),
 		Xpath: req.URL.Query().Get("xpath"),
 	}
 
-	res := Result{
+	res := result{
 		Query: q,
 	}
-	if len(q.Url) == 0 || len(q.Xpath) == 0 {
+	if len(q.URL) == 0 || len(q.Xpath) == 0 {
 		writer.WriteHeader(400)
 		res.Error = "Need both url and xpath query parameter."
 	} else {
-		content, e := ExtractXpathFromUrl(q.Xpath, q.Url)
+		content, e := ExtractXpathFromURL(q.Xpath, q.URL)
 		res.Result = content
-		res.Error = ErrorMessageOrNil(e)
+		res.Error = errorMessageOrNil(e)
 		if e != nil {
 			logger.Printf("ERROR: Could not get xpath for query %v because: %v", q, e)
 		}
@@ -151,10 +150,10 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 
 	if res.Error != nil {
 		status.LastError = time.Now()
-		status.ErrorCount += 1
+		status.ErrorCount++
 	} else {
 		status.LastOk = time.Now()
-		status.OkCount += 1
+		status.OkCount++
 	}
 
 	bytes, e := json.MarshalIndent(res, "", "  ")
@@ -164,12 +163,11 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	writer.Write(bytes)
 }
 
-func ErrorMessageOrNil(e error) interface{} {
+func errorMessageOrNil(e error) interface{} {
 	if e != nil {
 		return e.Error()
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func parseCommandLineArgs() (string, string, int) {
@@ -183,7 +181,7 @@ func parseCommandLineArgs() (string, string, int) {
 
 func runTestUsingCommentLineArgs(url string, xpath string) {
 	if len(url) > 0 && len(xpath) > 0 {
-		content, _ := ExtractXpathFromUrl(xpath, url)
+		content, _ := ExtractXpathFromURL(xpath, url)
 		fmt.Printf("EXTRACTED: `%s`\n", content)
 	}
 }
@@ -223,9 +221,9 @@ func main() {
 }
 
 func init() {
-	status = &Status{
+	status = &statusData{
 		Version:    os.Getenv("GIT_REVISION"),
 		GoVersion:  runtime.Version(),
-		DeployedAt: TimeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
+		DeployedAt: timeFromUnixTimeStampString(os.Getenv("DEPLOYED_AT")),
 	}
 }
