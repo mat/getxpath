@@ -1,5 +1,5 @@
 {
-	"ImportPath": "better-idea.org/xpathfetcher",
+	"ImportPath": "github.com/mat/getxpath",
 	"GoVersion": "go1.3",
 	"Packages": [
 		"."

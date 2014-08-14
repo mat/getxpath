@@ -7,7 +7,7 @@ deploy:
 	heroku config:set GIT_REVISION=`git describe --always` DEPLOYED_AT=`date +%s`
 
 run_server:
-	go run xpathfetcher.go -port=3000
+	go run getxpath.go -port=3000
 
 install_devtools:
 	go get code.google.com/p/go.tools/cmd/vet
