@@ -8,3 +8,12 @@ deploy:
 
 run_server:
 	go run xpathfetcher.go -port=3000
+
+install_devtools:
+	go get code.google.com/p/go.tools/cmd/vet
+	go get github.com/golang/lint/golint
+
+check:
+	go vet *.go
+	golint *.go
+
