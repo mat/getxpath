@@ -50,7 +50,7 @@ func timeFromUnixTimeStampString(str string) time.Time {
 	return time.Unix(int64(n), 0).In(loc)
 }
 
-func ExtractXpathFromURL(xpath string, url string) (string, error) {
+func ExtractXpathFromURL(url string, xpath string) (string, error) {
 	bodyBytes, e := readBodyFromURL(url)
 	if e != nil {
 		return "", e
@@ -140,7 +140,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		writer.WriteHeader(400)
 		res.Error = "Need both url and xpath query parameter."
 	} else {
-		content, e := ExtractXpathFromURL(q.Xpath, q.URL)
+		content, e := ExtractXpathFromURL(q.URL, q.Xpath)
 		res.Result = content
 		res.Error = errorMessageOrNil(e)
 		if e != nil {
@@ -181,7 +181,7 @@ func parseCommandLineArgs() (string, string, int) {
 
 func runTestUsingCommentLineArgs(url string, xpath string) {
 	if len(url) > 0 && len(xpath) > 0 {
-		content, _ := ExtractXpathFromURL(xpath, url)
+		content, _ := ExtractXpathFromURL(url, xpath)
 		fmt.Printf("EXTRACTED: `%s`\n", content)
 	}
 }

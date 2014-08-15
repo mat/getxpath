@@ -50,21 +50,21 @@ func TestErrorForNonExistentXpathElement(t *testing.T) {
 }
 
 func expectError(t *testing.T, uri string, xpath string) {
-	actual, e := ExtractXpathFromURL(xpath, uri)
+	actual, e := ExtractXpathFromURL(uri, xpath)
 	if e == nil {
 		t.Errorf("Did expect an eror but got none.")
 	}
 	if actual != "" {
-		t.Errorf("Expected empty result, but got ExtractXpathFromURL(%v, %v) = '%v'", xpath, uri, actual)
+		t.Errorf("Expected empty result, but got ExtractXpathFromURL(%v, %v) = '%v'", uri, xpath, actual)
 	}
 }
 
 func runTest(t *testing.T, expected string, uri string, xpath string) {
-	actual, e := ExtractXpathFromURL(xpath, uri)
+	actual, e := ExtractXpathFromURL(uri, xpath)
 	if e != nil {
 		t.Errorf("Did not expect an eror but got: %v", e)
 	}
 	if actual != expected {
-		t.Errorf("Got ExtractXpathFromURL(%v, %v) = '%v', wanted '%v'", xpath, uri, actual, expected)
+		t.Errorf("Got ExtractXpathFromURL(%v, %v) = '%v', wanted '%v'", uri, xpath, actual, expected)
 	}
 }
