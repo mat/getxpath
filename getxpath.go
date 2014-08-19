@@ -22,7 +22,7 @@ import (
 
 var logger = log.New(os.Stdout, "getxpath: ", log.LstdFlags|log.Lmicroseconds)
 
-func readBodyFromURL(url string) ([]byte, error) {
+func readBodyFromURL(url string) ([]byte, string, error) {
 	resp, e := http.Get(url)
 	for retries := 1; e != nil && retries <= 3; retries++ {
 		logger.Printf("Retrying to fetch %s (%d)\n", url, retries)
@@ -31,16 +31,18 @@ func readBodyFromURL(url string) ([]byte, error) {
 	}
 	if e != nil {
 		logger.Printf("Fetching %s failed too many times.", url)
-		return nil, e
+		return nil, "", e
 	}
 
 	bytes, e := ioutil.ReadAll(resp.Body)
 	if e != nil {
-		return nil, e
+		return nil, "", e
 	}
 	defer resp.Body.Close()
 
-	return bytes, nil
+	contentType := resp.Header.Get("Content-Type")
+
+	return bytes, contentType, nil
 }
 
 func timeFromUnixTimeStampString(str string) time.Time {
@@ -51,13 +53,13 @@ func timeFromUnixTimeStampString(str string) time.Time {
 }
 
 func ExtractXpathFromURL(url string, xpath string) (string, error) {
-	bodyBytes, e := readBodyFromURL(url)
+	bodyBytes, contentType, e := readBodyFromURL(url)
 	if e != nil {
 		return "", e
 	}
 	status.BytesProcessed += int64(len(bodyBytes))
 
-	utf8bytes, e := convertToUtf8(bodyBytes)
+	utf8bytes, e := convertToUtf8(bodyBytes, contentType)
 	if e != nil {
 		return "", e
 	}
@@ -88,9 +90,9 @@ func ExtractXpathFromURL(url string, xpath string) (string, error) {
 	return res, nil
 }
 
-func convertToUtf8(bytez []byte) ([]byte, error) {
+func convertToUtf8(bytez []byte, contentType string) ([]byte, error) {
 	reader := bytes.NewReader(bytez)
-	utf8reader, e := charset.NewReader(reader, "")
+	utf8reader, e := charset.NewReader(reader, contentType)
 	utf8bytes, e := ioutil.ReadAll(utf8reader)
 	return utf8bytes, e
 }

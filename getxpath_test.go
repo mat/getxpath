@@ -1,6 +1,7 @@
 package main
 
 import "testing"
+import "strings"
 
 func TestBasic(t *testing.T) {
 	xpath := "//title"
@@ -37,6 +38,13 @@ func TestUmlautsOnAmazonDe(t *testing.T) {
 	runTest(t, expected, uri, xpath)
 }
 
+func TestUmlautsOnHackerNews(t *testing.T) {
+	xpath := "//html/body"
+	uri := "https://news.ycombinator.com/news?p=2"
+	expected := "California “Kill Switch” Bill Could Be Used to Disrupt Protests"
+	expectContainsString(t, expected, uri, xpath)
+}
+
 func TestErrorForNonExistentHost(t *testing.T) {
 	xpath := "//title"
 	uri := "http://www.does-not-exist-domain.de"
@@ -66,5 +74,15 @@ func runTest(t *testing.T, expected string, uri string, xpath string) {
 	}
 	if actual != expected {
 		t.Errorf("Got ExtractXpathFromURL(%v, %v) = '%v', wanted '%v'", uri, xpath, actual, expected)
+	}
+}
+
+func expectContainsString(t *testing.T, expected string, uri string, xpath string) {
+	actual, e := ExtractXpathFromURL(uri, xpath)
+	if e != nil {
+		t.Errorf("Did not expect an eror but got: %v", e)
+	}
+	if !strings.Contains(actual, expected) {
+		t.Errorf("Expected '%v' to contain '%v'", actual, expected)
 	}
 }
