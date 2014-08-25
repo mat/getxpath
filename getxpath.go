@@ -131,8 +131,8 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Add("Content-Type", "application/json; charset=utf-8")
 
 	q := query{
-		URL:   req.URL.Query().Get("url"),
-		Xpath: req.URL.Query().Get("xpath"),
+		URL:   req.FormValue("url"),
+		Xpath: req.FormValue("xpath"),
 	}
 
 	res := result{
