@@ -138,16 +138,16 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 	res := result{
 		Query: q,
 	}
-	if len(q.URL) == 0 || len(q.Xpath) == 0 {
-		writer.WriteHeader(400)
-		res.Error = "Need both url and xpath query parameter."
-	} else {
+	if len(q.URL) > 0 && len(q.Xpath) > 0 {
 		content, e := ExtractXpathFromURL(q.URL, q.Xpath)
 		res.Result = content
 		res.Error = errorMessageOrNil(e)
 		if e != nil {
 			logger.Printf("ERROR: Could not get xpath for query %v because: %v", q, e)
 		}
+	} else {
+		writer.WriteHeader(400)
+		res.Error = "Need both url and xpath query parameter."
 	}
 
 	if res.Error != nil {
