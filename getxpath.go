@@ -158,7 +158,7 @@ func requestHandler(writer http.ResponseWriter, req *http.Request) {
 		status.OkCount++
 	}
 
-	bytes, e := json.MarshalIndent(res, "", "  ")
+	bytes, e := json.Marshal(res)
 	if e != nil {
 		panic(e)
 	}
