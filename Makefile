@@ -15,8 +15,12 @@ run_server:
 install_devtools:
 	go get code.google.com/p/go.tools/cmd/vet
 	go get github.com/golang/lint/golint
+	go get github.com/tools/godep
 
 check:
 	go vet *.go
 	golint *.go
+
+vendor_dependencies:
+	godep save -r ./...
 
