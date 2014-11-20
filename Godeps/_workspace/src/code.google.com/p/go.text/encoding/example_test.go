@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
-	"code.google.com/p/go.text/encoding"
-	"code.google.com/p/go.text/encoding/charmap"
-	"code.google.com/p/go.text/transform"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/encoding"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/encoding/charmap"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/transform"
 )
 
 func ExampleDecodeWindows1252() {

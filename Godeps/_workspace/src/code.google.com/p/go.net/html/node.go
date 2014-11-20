@@ -5,7 +5,7 @@
 package html
 
 import (
-	"code.google.com/p/go.net/html/atom"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html/atom"
 )
 
 // A NodeType is the type of a Node.

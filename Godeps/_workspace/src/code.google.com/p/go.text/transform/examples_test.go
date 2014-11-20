@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"code.google.com/p/go.text/transform"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/transform"
 	"code.google.com/p/go.text/unicode/norm"
 )
 

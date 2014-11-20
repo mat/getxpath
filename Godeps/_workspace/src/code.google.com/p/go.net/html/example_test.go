@@ -10,7 +10,7 @@ import (
 	"log"
 	"strings"
 
-	"code.google.com/p/go.net/html"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html"
 )
 
 func ExampleParse() {

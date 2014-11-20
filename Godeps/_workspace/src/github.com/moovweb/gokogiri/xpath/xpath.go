@@ -41,7 +41,7 @@ int getXPathObjectType(xmlXPathObject* o) {
 import "C"
 
 import "unsafe"
-import . "github.com/moovweb/gokogiri/util"
+import . "github.com/mat/getxpath/Godeps/_workspace/src/github.com/moovweb/gokogiri/util"
 import "runtime"
 import "errors"
 

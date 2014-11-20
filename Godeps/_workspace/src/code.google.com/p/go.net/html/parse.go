@@ -10,7 +10,7 @@ import (
 	"io"
 	"strings"
 
-	a "code.google.com/p/go.net/html/atom"
+	a "github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html/atom"
 )
 
 // A parser implements the HTML5 parsing algorithm:

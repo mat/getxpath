@@ -11,10 +11,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"code.google.com/p/go.net/html"
-	"code.google.com/p/go.text/encoding"
-	"code.google.com/p/go.text/encoding/charmap"
-	"code.google.com/p/go.text/transform"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/encoding"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/encoding/charmap"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/transform"
 )
 
 // Lookup returns the encoding with the specified label, and its canonical

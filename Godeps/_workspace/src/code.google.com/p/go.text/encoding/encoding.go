@@ -20,7 +20,7 @@ import (
 	"errors"
 	"unicode/utf8"
 
-	"code.google.com/p/go.text/transform"
+	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.text/transform"
 )
 
 // Encoding is a character set encoding that can be transformed to and from
