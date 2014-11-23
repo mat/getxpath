@@ -13,6 +13,8 @@ run_server:
 	go run getxpath.go -port=3000
 
 install_devtools:
+	go get code.google.com/p/go.tools/cmd/cover
+	go get code.google.com/p/go.tools/cmd/godoc
 	go get code.google.com/p/go.tools/cmd/vet
 	go get github.com/golang/lint/golint
 	go get github.com/tools/godep
