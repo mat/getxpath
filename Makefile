@@ -25,4 +25,7 @@ check:
 
 vendor_dependencies:
 	godep save -r ./...
+	# Need to go get in order to fill $GOPATH/pkg... to minimize compile times.
+	go get github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html/charset
+	go get github.com/mat/getxpath/Godeps/_workspace/src/github.com/moovweb/gokogiri
 
