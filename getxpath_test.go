@@ -31,13 +31,6 @@ func TestUmlautsInContent(t *testing.T) {
 	runTest(t, expected, uri, xpath)
 }
 
-func TestUmlautsOnAmazonDe(t *testing.T) {
-	xpath := "//title"
-	uri := "http://www.amazon.de"
-	expected := "Amazon.de: Günstige Preise für Elektronik & Foto, Filme, Musik, Bücher, Games, Spielzeug & mehr"
-	runTest(t, expected, uri, xpath)
-}
-
 func TestErrorForNonExistentHost(t *testing.T) {
 	xpath := "//title"
 	uri := "http://www.does-not-exist-domain.de"
