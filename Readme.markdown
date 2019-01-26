@@ -1,5 +1,7 @@
 # getxpath
 
+[![Build Status](https://travis-ci.com/mat/getxpath.svg?branch=master)](https://travis-ci.com/mat/getxpath)
+
 ## Example
 
 <https://getxpath.herokuapp.com/get?url=http://google.com&xpath=//title>
