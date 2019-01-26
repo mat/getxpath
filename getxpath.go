@@ -92,6 +92,9 @@ func ExtractXpathFromURL(url string, xpath string) (string, error) {
 func convertToUtf8(bytez []byte, contentType string) ([]byte, error) {
 	reader := bytes.NewReader(bytez)
 	utf8reader, e := charset.NewReader(reader, contentType)
+	if e != nil {
+		return nil, e
+	}
 	utf8bytes, e := ioutil.ReadAll(utf8reader)
 	return utf8bytes, e
 }
