@@ -1,8 +1,8 @@
 
 test:
-	go test
+	go test -v
 
-update_godeps: 
+update_godeps:
 	godep save .
 
 deploy:
