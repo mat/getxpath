@@ -15,9 +15,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mat/getxpath/Godeps/_workspace/src/code.google.com/p/go.net/html/charset"
-
-	"github.com/mat/getxpath/Godeps/_workspace/src/github.com/moovweb/gokogiri"
+	"github.com/moovweb/gokogiri"
+	"golang.org/x/net/html/charset"
 )
 
 var logger = log.New(os.Stdout, "getxpath: ", log.LstdFlags|log.Lmicroseconds)
