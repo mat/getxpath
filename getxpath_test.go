@@ -38,13 +38,6 @@ func TestUmlautsOnAmazonDe(t *testing.T) {
 	runTest(t, expected, uri, xpath)
 }
 
-func TestUmlautsOnHackerNews(t *testing.T) {
-	xpath := "//html/body"
-	uri := "https://news.ycombinator.com/news?p=2"
-	expected := "California “Kill Switch” Bill Could Be Used to Disrupt Protests"
-	expectContainsString(t, expected, uri, xpath)
-}
-
 func TestErrorForNonExistentHost(t *testing.T) {
 	xpath := "//title"
 	uri := "http://www.does-not-exist-domain.de"
