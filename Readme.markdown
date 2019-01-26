@@ -1,6 +1,7 @@
 # getxpath
 
 [![Build Status](https://travis-ci.com/mat/getxpath.svg?branch=master)](https://travis-ci.com/mat/getxpath)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mat/getxpath)](https://goreportcard.com/report/github.com/mat/getxpath)
 
 ## Example
 
