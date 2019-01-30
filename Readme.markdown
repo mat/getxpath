@@ -18,6 +18,10 @@
 }
 ```
 
+## Hosting
+
+An easy way to host this service is to use Heroku, just go to <https://heroku.com/deploy> to get started.
+
 ## License
 
 The MIT License (MIT)

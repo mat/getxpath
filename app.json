@@ -1,0 +1,8 @@
+{
+	"name": "getxpath",
+	"description": "A 'get web page text at XPath' microservice written in Go",
+	"repository": "https://github.com/mat/getxpath",
+	"website": "https://github.com/mat/getxpath",
+	"env": {
+	}
+}
